@@ -1,82 +1,36 @@
-# Next.js Starter Template
+# Motivation
 
-A Next.js starter template with Tailwind CSS, Supabase Auth, and Vercel deployment.
+Track your habits. Build your life.
 
-## Quick Start
-
-```bash
-# 1. Clone the repository
-git clone <your-repo-url>
-cd boilerplate
-
-# 2. Install dependencies
-npm install
-
-# 3. Copy environment variables
-cp .env.sample .env.local
-
-# 4. Start the development server
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to see your app.
-
-## Project Structure
-
-```
-app/                    # Pages and routes
-├── page.tsx           # Home/landing page
-├── dashboard/         # Protected dashboard
-├── (auth)/            # Sign in/up pages
-└── api/               # API routes
-
-components/            # Reusable components
-├── ui/               # Button, Card, Input
-├── layout/           # Header, Footer
-└── landing/          # Hero
-
-lib/                   # Utilities (Supabase client, helpers)
-```
+A personal habit tracking app built with Next.js, Supabase, and Tailwind CSS. Dark, minimal UI optimized for Android mobile.
 
 ## Features
 
-- **Next.js 16** with App Router
-- **Tailwind CSS 4**
-- **Supabase Auth + DB** (optional) - just add your keys
-- **Vercel Ready** - deploy in minutes
+- **Daily Habit Tracking** — Morning and evening habit stacks with animated card interactions
+- **Core Scores** — Rate 5 life pillars (Happy, Healthy, Wealthy, Grounded, Motivated) on a 1–5 scale for a daily score out of 25
+- **AI Insights** — Weekly narrative and pillar predictions powered by Claude
+- **Insights** — Streak tracking, pillar charts, habit heatmap, and data table
+- **Demo Mode** — Try the full app without an account
+- **Mobile-first** — Fixed bottom nav, optimized for Android viewport
 
-## Adding Authentication & Database
+## Stack
 
-1. Create a Supabase project at https://supabase.com/dashboard
-2. Go to Project Settings → API and copy your keys
-3. Add to `.env.local`:
+- [Next.js 16](https://nextjs.org) — App Router, Server Actions
+- [Supabase](https://supabase.com) — Auth, Postgres, Row Level Security
+- [Tailwind CSS v4](https://tailwindcss.com)
+- [Anthropic Claude](https://anthropic.com) — AI insight generation
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGc...
-```
-
-4. The auth features will automatically work!
-
-## Deployment
+## Getting Started
 
 ```bash
-npm run build
-npx vercel --prod
+npm install
+npm run dev
 ```
 
-Don't forget to add your environment variables in the Vercel dashboard.
+Copy `.env.local.sample` to `.env.local` and add your keys:
 
-## Documentation
-
-- [CLAUDE.md](./CLAUDE.md) - Project guide
-- [PREREQUISITES.md](./PREREQUISITES.md) - Setup requirements
-
-## Scripts
-
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Build for production |
-| `npm run start` | Run production build |
-| `npm run lint` | Check for issues |
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+ANTHROPIC_API_KEY=
+```
