@@ -10,10 +10,14 @@ export async function GET(request: Request) {
     const supabase = await createServerSupabaseClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      // Use NEXT_PUBLIC_APP_URL for production, fall back to request origin
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || origin;
+      return NextResponse.redirect(`${appUrl}${next}`);
     }
   }
 
   // Something went wrong — send to sign-in with error
-  return NextResponse.redirect(`${origin}/sign-in?error=Could+not+sign+in+with+Google`);
+  // Use NEXT_PUBLIC_APP_URL for production, fall back to request origin
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || origin;
+  return NextResponse.redirect(`${appUrl}/sign-in?error=Could+not+sign+in+with+Google`);
 }
