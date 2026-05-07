@@ -6,12 +6,20 @@ export async function GET(request: Request) {
   const code = searchParams.get("code");
   const next = searchParams.get("next") ?? "/dashboard";
 
+  // Debug logging
+  console.log('[OAuth Callback Debug]', {
+    origin,
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NODE_ENV: process.env.NODE_ENV,
+  });
+
   if (code) {
     const supabase = await createServerSupabaseClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
       // Use NEXT_PUBLIC_APP_URL for production, fall back to request origin
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || origin;
+      console.log('[OAuth Callback] Redirecting to:', `${appUrl}${next}`);
       return NextResponse.redirect(`${appUrl}${next}`);
     }
   }
@@ -19,5 +27,6 @@ export async function GET(request: Request) {
   // Something went wrong — send to sign-in with error
   // Use NEXT_PUBLIC_APP_URL for production, fall back to request origin
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || origin;
+  console.log('[OAuth Callback Error] Redirecting to:', `${appUrl}/sign-in`);
   return NextResponse.redirect(`${appUrl}/sign-in?error=Could+not+sign+in+with+Google`);
 }
