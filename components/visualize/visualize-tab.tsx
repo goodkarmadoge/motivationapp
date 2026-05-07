@@ -39,15 +39,17 @@ export function VisualizeTab({ today, isDemo }: VisualizeTabProps) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <p className="text-xs text-gray-400">Trend window</p>
+      <div className="flex items-center justify-between mb-6 animate-fade-up">
+        <p className="text-[10px] uppercase tracking-[0.2em] font-semibold text-white/40">
+          Trend window
+        </p>
         <TimeRangePicker value={range} onChange={setRange} />
       </div>
 
       {loading ? (
         <div className="space-y-4 animate-pulse">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-gray-50 rounded-xl" />
+            <div key={i} className="h-32 bg-white/[0.04] rounded-2xl" />
           ))}
         </div>
       ) : (

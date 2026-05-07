@@ -38,11 +38,19 @@ export default async function DashboardPage() {
     user_id: user.id,
   }
 
+  const meta = user.user_metadata as { full_name?: string; name?: string } | undefined
+  const firstName =
+    meta?.full_name?.trim().split(/\s+/)[0] ||
+    meta?.name?.trim().split(/\s+/)[0] ||
+    user.email?.split('@')[0] ||
+    'there'
+
   return (
     <DashboardShell
       initialLog={initialLog}
       initialWeeklyLog={weeklyLog}
       today={today}
+      userFirstName={firstName}
     />
   )
 }

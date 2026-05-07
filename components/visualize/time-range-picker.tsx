@@ -18,17 +18,17 @@ const OPTIONS: { value: TimeRange; label: string }[] = [
 
 export function TimeRangePicker({ value, onChange }: TimeRangePickerProps) {
   return (
-    <div className="flex gap-1 p-1 bg-gray-100 rounded-lg w-fit">
+    <div className="flex gap-0.5 p-1 bg-white/[0.04] border border-white/[0.06] rounded-lg w-fit">
       {OPTIONS.map((opt) => (
         <button
           key={opt.value}
           type="button"
           onClick={() => onChange(opt.value)}
           className={cn(
-            'px-3 py-1 text-xs font-semibold rounded-md transition-all',
+            'px-3 py-1 text-[11px] font-semibold tracking-wide rounded-md transition-all duration-150',
             value === opt.value
-              ? 'bg-white text-black shadow-sm'
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'bg-white/[0.1] text-white/88'
+              : 'text-white/40 hover:text-white/70'
           )}
         >
           {opt.label}
