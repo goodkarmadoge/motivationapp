@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils'
 
-export type Tab = 'habits' | 'core-scores' | 'insights'
+export type Tab = 'habits' | 'core-scores' | 'insights' | 'goals'
 
 interface TabNavProps {
   active: Tab
@@ -33,7 +33,18 @@ function InsightsIcon({ active }: { active: boolean }) {
   )
 }
 
+function GoalsIcon({ active }: { active: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 1.75 : 1.5} strokeLinecap="round" strokeLinejoin="round" className="w-[22px] h-[22px]">
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="5" />
+      <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
 const TABS: { value: Tab; label: string; Icon: React.ComponentType<{ active: boolean }> }[] = [
+  { value: 'goals', label: 'Goals', Icon: GoalsIcon },
   { value: 'habits', label: 'Habits', Icon: HabitsIcon },
   { value: 'core-scores', label: 'Scores', Icon: ScoresIcon },
   { value: 'insights', label: 'Insights', Icon: InsightsIcon },

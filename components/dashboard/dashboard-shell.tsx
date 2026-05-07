@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import { TabNav, type Tab } from './tab-nav'
 import { DashboardHeader } from './dashboard-header'
+import { UserHeader } from './user-header'
 import { HabitsTab } from '@/components/habits/habits-tab'
 import { CoreScoresTab } from '@/components/core-scores/core-scores-tab'
 import { VisualizeTab } from '@/components/visualize/visualize-tab'
+import { GoalsTab } from '@/components/goals/goals-tab'
 import { calculateDailyScore } from '@/lib/habits'
 import type { DailyLog, WeeklyLog } from '@/types/habit'
 
@@ -14,9 +16,10 @@ interface DashboardShellProps {
   initialWeeklyLog: WeeklyLog | null
   today: string
   isDemo?: boolean
+  userFirstName?: string
 }
 
-export function DashboardShell({ initialLog, initialWeeklyLog, today, isDemo }: DashboardShellProps) {
+export function DashboardShell({ initialLog, initialWeeklyLog, today, isDemo, userFirstName }: DashboardShellProps) {
   const [activeTab, setActiveTab] = useState<Tab>('habits')
   const [log, setLog] = useState<DailyLog>(initialLog)
 
@@ -25,7 +28,7 @@ export function DashboardShell({ initialLog, initialWeeklyLog, today, isDemo }: 
   return (
     <div className="min-h-screen bg-[#0C0C0C]">
       <div className="max-w-[430px] mx-auto px-4 sm:px-5 pt-5 pb-24">
-        {isDemo && (
+        {isDemo ? (
           <div className="mb-4 flex items-center justify-between rounded-xl border border-white/[0.07] bg-white/[0.03] px-4 py-2.5 animate-fade-up">
             <p className="text-sm text-white/40">
               <span className="font-semibold text-white/60">Demo mode</span> — data is not saved.
@@ -37,7 +40,9 @@ export function DashboardShell({ initialLog, initialWeeklyLog, today, isDemo }: 
               Exit demo
             </a>
           </div>
-        )}
+        ) : userFirstName ? (
+          <UserHeader firstName={userFirstName} />
+        ) : null}
 
         <DashboardHeader score={score} max={max} date={today} />
 
@@ -62,6 +67,10 @@ export function DashboardShell({ initialLog, initialWeeklyLog, today, isDemo }: 
 
         {activeTab === 'insights' && (
           <VisualizeTab today={today} isDemo={isDemo} />
+        )}
+
+        {activeTab === 'goals' && (
+          <GoalsTab />
         )}
       </div>
 
