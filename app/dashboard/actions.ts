@@ -152,3 +152,32 @@ export async function deleteAiInsightCache(date: string): Promise<void> {
 export async function getCurrentWeeklyLog(): Promise<WeeklyLog | null> {
   return getWeeklyLog(weekStartISO())
 }
+
+export async function getGoogleFitStatus(): Promise<boolean> {
+  try {
+    const supabase = await createServerSupabaseClient()
+    const userId = await getUserId()
+    const { data } = await supabase
+      .from('google_fit_tokens')
+      .select('user_id')
+      .eq('user_id', userId)
+      .single()
+    return !!data
+  } catch {
+    return false
+  }
+}
+
+export async function syncStepsFromGoogleFit(date: string): Promise<{ steps: number | null }> {
+  const { fetchStepsForDate } = await import('@/lib/google-fit')
+  const userId = await getUserId()
+  const steps = await fetchStepsForDate(userId, date)
+
+  await upsertDailyLog(date, {
+    habit_step_count: steps,
+    habit_step_source: 'google_fit',
+    ...(steps !== null && steps >= 10000 ? { habit_10k_steps: true } : {}),
+  })
+
+  return { steps }
+}

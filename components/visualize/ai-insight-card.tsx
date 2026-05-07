@@ -12,12 +12,33 @@ interface AiInsightCardProps {
 
 export function AiInsightCard({ today }: AiInsightCardProps) {
   const [insight, setInsight] = useState<AiInsight | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [cacheChecked, setCacheChecked] = useState(false)
+  const [generating, setGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [, startTransition] = useTransition()
 
-  async function fetchInsight() {
-    setLoading(true)
+  // On mount: cache lookup only — fast Supabase read, no generation
+  useEffect(() => {
+    let cancelled = false
+    async function checkCache() {
+      try {
+        const res = await fetch(`/api/ai-insight?date=${today}`)
+        if (!cancelled && res.ok) {
+          const data = await res.json()
+          setInsight(data ?? null)
+        }
+      } catch {
+        // cache miss is fine — user can generate manually
+      } finally {
+        if (!cancelled) setCacheChecked(true)
+      }
+    }
+    checkCache()
+    return () => { cancelled = true }
+  }, [today])
+
+  async function handleGenerate() {
+    setGenerating(true)
     setError(null)
     try {
       const res = await fetch('/api/ai-insight', {
@@ -26,21 +47,19 @@ export function AiInsightCard({ today }: AiInsightCardProps) {
         body: JSON.stringify({ date: today }),
       })
       if (!res.ok) throw new Error(await res.text())
-      const data = await res.json()
-      setInsight(data)
+      setInsight(await res.json())
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load insight')
+      setError(e instanceof Error ? e.message : 'Failed to generate insight')
     } finally {
-      setLoading(false)
+      setGenerating(false)
     }
   }
-
-  useEffect(() => { fetchInsight() }, [today])
 
   function handleRegenerate() {
     startTransition(async () => {
       await deleteAiInsightCache(today)
-      fetchInsight()
+      setInsight(null)
+      handleGenerate()
     })
   }
 
@@ -63,30 +82,64 @@ export function AiInsightCard({ today }: AiInsightCardProps) {
             Powered by Claude — correlations & predictions
           </p>
         </div>
-        {!loading && (
+        {insight && !generating && (
           <button
             onClick={handleRegenerate}
             className="text-[11px] uppercase tracking-[0.18em] font-semibold text-white/40 hover:text-white/80 transition-colors"
           >
-            Regenerate
+            Update
           </button>
         )}
       </div>
 
       <div className="rounded-2xl border border-white/[0.05] bg-white/[0.03] p-5 space-y-5">
-        {loading && (
+
+        {/* Brief skeleton while cache check is in-flight */}
+        {!cacheChecked && (
           <div className="space-y-3 animate-pulse">
-            <div className="h-3 bg-white/[0.06] rounded w-full" />
-            <div className="h-3 bg-white/[0.06] rounded w-5/6" />
-            <div className="h-3 bg-white/[0.06] rounded w-4/6" />
+            <div className="h-3 bg-white/[0.06] rounded w-3/4" />
+            <div className="h-3 bg-white/[0.06] rounded w-1/2" />
           </div>
         )}
 
-        {error && (
-          <p className="text-sm text-red-400/90">{error}</p>
+        {/* No cached insight — show generate CTA */}
+        {cacheChecked && !insight && !generating && !error && (
+          <div className="flex flex-col items-center py-5 gap-4">
+            <p className="text-sm text-white/40 text-center leading-relaxed max-w-[260px]">
+              Generate today&apos;s insight to see habit correlations, pillar predictions, and a weekly summary.
+            </p>
+            <button
+              onClick={handleGenerate}
+              className="px-5 py-2.5 rounded-xl bg-[#C8A96E]/[0.1] border border-[#C8A96E]/20 text-[13px] font-semibold text-[#C8A96E]/90 hover:bg-[#C8A96E]/[0.18] transition-all"
+            >
+              Generate Insights
+            </button>
+          </div>
         )}
 
-        {insight && !loading && (
+        {/* Generating spinner */}
+        {generating && (
+          <div className="flex flex-col items-center py-6 gap-3">
+            <div className="w-5 h-5 rounded-full border-2 border-[#C8A96E]/30 border-t-[#C8A96E] animate-spin" />
+            <p className="text-xs text-white/35">Analyzing your data…</p>
+          </div>
+        )}
+
+        {/* Error state */}
+        {error && !generating && (
+          <div className="space-y-3">
+            <p className="text-sm text-red-400/90">{error}</p>
+            <button
+              onClick={handleGenerate}
+              className="text-[11px] uppercase tracking-[0.18em] font-semibold text-white/40 hover:text-white/80 transition-colors"
+            >
+              Try again
+            </button>
+          </div>
+        )}
+
+        {/* Insight content */}
+        {insight && !generating && (
           <>
             {insight.correlation_text && (
               <div>

@@ -3,6 +3,29 @@ import { createServerSupabaseClient } from '@/lib/supabase'
 import { getLast30Days } from '@/app/dashboard/actions'
 import { generateInsight } from '@/lib/ai'
 
+// Cache-only check — returns the stored insight or null, never generates
+export async function GET(req: NextRequest) {
+  try {
+    const supabase = await createServerSupabaseClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json(null)
+
+    const date = req.nextUrl.searchParams.get('date')
+    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return NextResponse.json(null)
+
+    const { data } = await supabase
+      .from('ai_insights')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('insight_date', date)
+      .single()
+
+    return NextResponse.json(data ?? null)
+  } catch {
+    return NextResponse.json(null)
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient()
@@ -10,7 +33,9 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const { date } = await req.json()
-    if (!date) return NextResponse.json({ error: 'Missing date' }, { status: 400 })
+    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return NextResponse.json({ error: 'Invalid or missing date' }, { status: 400 })
+    }
 
     // Check cache first
     const { data: cached } = await supabase
@@ -49,9 +74,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(payload)
   } catch (err) {
     console.error('[ai-insight]', err)
-    return NextResponse.json(
-      { error: 'Failed to generate insight. Check ANTHROPIC_API_KEY is set.' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to generate insight.' }, { status: 500 })
   }
 }

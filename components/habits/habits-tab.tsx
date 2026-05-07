@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from 'react'
 import { HabitCard } from './habit-card'
+import { GoogleFitBanner } from './google-fit-banner'
 import { MORNING_HABITS, EVENING_HABITS, isFriday } from '@/lib/habits'
 import { upsertDailyLog } from '@/app/dashboard/actions'
 import { WeekRecapSection } from '@/components/integrate/week-recap-section'
@@ -13,9 +14,10 @@ interface HabitsTabProps {
   today: string
   onLogChange: (log: DailyLog) => void
   isDemo?: boolean
+  googleFitConnected?: boolean
 }
 
-export function HabitsTab({ log, weeklyLog, today, onLogChange, isDemo }: HabitsTabProps) {
+export function HabitsTab({ log, weeklyLog, today, onLogChange, isDemo, googleFitConnected }: HabitsTabProps) {
   const logRef = useRef<DailyLog>(log)
   logRef.current = log
 
@@ -108,8 +110,20 @@ export function HabitsTab({ log, weeklyLog, today, onLogChange, isDemo }: Habits
         </div>
       </section>
 
+      {/* Google Fit banner */}
+      {!isDemo && (
+        <div className="mb-8 animate-fade-up" style={{ animationDelay: '200ms' }}>
+          <GoogleFitBanner
+            connected={!!googleFitConnected}
+            log={log}
+            today={today}
+            onLogChange={onLogChange}
+          />
+        </div>
+      )}
+
       {/* Divider */}
-      <div className="h-px bg-white/[0.05] mb-8 animate-fade-up" style={{ animationDelay: '200ms' }} />
+      <div className="h-px bg-white/[0.05] mb-8 animate-fade-up" style={{ animationDelay: '240ms' }} />
 
       {/* Evening section */}
       <section className="mb-8">

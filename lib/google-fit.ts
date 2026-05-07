@@ -77,3 +77,13 @@ export async function fetchStepsForDate(userId: string, date: string): Promise<n
   const steps = point?.value?.[0]?.intVal as number | undefined
   return steps ?? null
 }
+
+export async function isGoogleFitConnected(userId: string): Promise<boolean> {
+  const supabase = await createServerSupabaseClient()
+  const { data } = await supabase
+    .from('google_fit_tokens')
+    .select('user_id')
+    .eq('user_id', userId)
+    .single()
+  return !!data
+}

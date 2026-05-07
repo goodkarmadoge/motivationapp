@@ -17,9 +17,10 @@ interface DashboardShellProps {
   today: string
   isDemo?: boolean
   userFirstName?: string
+  googleFitConnected?: boolean
 }
 
-export function DashboardShell({ initialLog, initialWeeklyLog, today, isDemo, userFirstName }: DashboardShellProps) {
+export function DashboardShell({ initialLog, initialWeeklyLog, today, isDemo, userFirstName, googleFitConnected }: DashboardShellProps) {
   const [activeTab, setActiveTab] = useState<Tab>('habits')
   const [log, setLog] = useState<DailyLog>(initialLog)
 
@@ -53,6 +54,7 @@ export function DashboardShell({ initialLog, initialWeeklyLog, today, isDemo, us
             today={today}
             onLogChange={setLog}
             isDemo={isDemo}
+            googleFitConnected={googleFitConnected}
           />
         )}
 

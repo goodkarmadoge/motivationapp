@@ -2,7 +2,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import { DashboardShell } from '@/components/dashboard/dashboard-shell'
-import { getDailyLog, getCurrentWeeklyLog } from './actions'
+import { getDailyLog, getCurrentWeeklyLog, getGoogleFitStatus } from './actions'
 import { DEFAULT_DAILY_LOG, todayISO } from '@/lib/habits'
 import type { DailyLog } from '@/types/habit'
 
@@ -27,9 +27,10 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/sign-in')
 
-  const [existingLog, weeklyLog] = await Promise.all([
+  const [existingLog, weeklyLog, googleFitConnected] = await Promise.all([
     getDailyLog(today),
     getCurrentWeeklyLog(),
+    getGoogleFitStatus(),
   ])
 
   const initialLog: DailyLog = existingLog ?? {
@@ -51,6 +52,7 @@ export default async function DashboardPage() {
       initialWeeklyLog={weeklyLog}
       today={today}
       userFirstName={firstName}
+      googleFitConnected={googleFitConnected}
     />
   )
 }
