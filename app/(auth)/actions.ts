@@ -1,52 +1,26 @@
-/**
- * Authentication Server Actions
- *
- * Server-side actions for sign-in, sign-up, and sign-out.
- * Called from form submissions on the auth pages.
- */
-
 "use server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createServerSupabaseClient } from "@/lib/supabase";
 
-export async function signIn(formData: FormData) {
+export async function signInWithGoogle() {
   const supabase = await createServerSupabaseClient();
+  const origin = (await headers()).get("origin") ?? "";
 
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${origin}/api/auth/callback`,
+    },
   });
 
   if (error) {
     redirect(`/sign-in?error=${encodeURIComponent(error.message)}`);
   }
 
-  revalidatePath("/", "layout");
-  redirect("/dashboard");
-}
-
-export async function signUp(formData: FormData) {
-  const supabase = await createServerSupabaseClient();
-
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-  });
-
-  if (error) {
-    redirect(`/sign-up?error=${encodeURIComponent(error.message)}`);
-  }
-
-  revalidatePath("/", "layout");
-  redirect("/dashboard");
+  redirect(data.url);
 }
 
 export async function signOut() {
