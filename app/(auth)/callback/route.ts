@@ -11,11 +11,15 @@ export async function GET(request: NextRequest) {
     const supabase = await createServerSupabaseClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      // Use NEXT_PUBLIC_APP_URL for production, fall back to request origin
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || origin;
+      return NextResponse.redirect(`${appUrl}${next}`);
     }
   }
 
+  // Use NEXT_PUBLIC_APP_URL for production, fall back to request origin
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || origin;
   return NextResponse.redirect(
-    `${origin}/sign-in?error=${encodeURIComponent("Authentication failed. Please try again.")}`
+    `${appUrl}/sign-in?error=${encodeURIComponent("Authentication failed. Please try again.")}`
   );
 }
