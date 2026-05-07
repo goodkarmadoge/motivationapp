@@ -13,7 +13,6 @@ export default async function SignInPage({
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0C0C0C] py-12 px-4">
       <div className="w-full max-w-sm">
-
         <div className="flex flex-col items-center mb-10 animate-fade-up">
           <MotivationWordmark size="lg" orientation="vertical" />
           <p className="text-white/30 text-sm mt-4 tracking-wide">Track your habits. Build your life.</p>
