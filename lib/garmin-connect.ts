@@ -4,13 +4,13 @@ export async function fetchGarminStepsForDate(date: string): Promise<number | nu
   if (!email || !password) return null
 
   try {
-    // garmin-connect is an unofficial library using credential-based auth (no OAuth needed)
+    // garmin-connect uses credential-based auth (no OAuth needed)
     const { GarminConnect } = await import('garmin-connect')
     const client = new GarminConnect({ username: email, password })
     await client.login()
     const dateObj = new Date(date + 'T12:00:00')
-    const summary = await client.getDailySteps(dateObj)
-    const steps = summary?.totalSteps
+    // getSteps() returns a number directly
+    const steps = await client.getSteps(dateObj)
     return typeof steps === 'number' ? steps : null
   } catch (err) {
     console.error('[Garmin] step fetch failed:', err)
