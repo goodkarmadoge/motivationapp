@@ -33,12 +33,51 @@ export function RouteIcon({ className }: IconProps) {
   )
 }
 
+export function SunriseIcon({ className }: IconProps) {
+  return (
+    <svg {...iconProps} className={className}>
+      <path d="M17 18a5 5 0 00-10 0" />
+      <line x1="12" y1="9" x2="12" y2="2" />
+      <line x1="4.22" y1="10.22" x2="5.64" y2="11.64" />
+      <line x1="1" y1="18" x2="3" y2="18" />
+      <line x1="21" y1="18" x2="23" y2="18" />
+      <line x1="18.36" y1="11.64" x2="19.78" y2="10.22" />
+      <polyline points="16 5 12 1 8 5" />
+    </svg>
+  )
+}
+
+export function HeadphonesIcon({ className }: IconProps) {
+  return (
+    <svg {...iconProps} className={className}>
+      <path d="M3 18v-6a9 9 0 0118 0v6" />
+      <path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z" />
+    </svg>
+  )
+}
+
 export function BowlIcon({ className }: IconProps) {
   return (
     <svg {...iconProps} className={className}>
       <path d="M12 2a10 10 0 0110 10H2A10 10 0 0112 2z" />
       <path d="M5 12c0 3.87 3.13 7 7 7s7-3.13 7-7" />
       <path d="M8.5 2.5L9.5 6M12 2v4M15.5 2.5L14.5 6" />
+    </svg>
+  )
+}
+
+export function DropletIcon({ className }: IconProps) {
+  return (
+    <svg {...iconProps} className={className}>
+      <path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" />
+    </svg>
+  )
+}
+
+export function ZapIcon({ className }: IconProps) {
+  return (
+    <svg {...iconProps} className={className}>
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
     </svg>
   )
 }
@@ -80,44 +119,21 @@ export function ActivityIcon({ className }: IconProps) {
   )
 }
 
-export function UtensilsIcon({ className }: IconProps) {
-  return (
-    <svg {...iconProps} className={className}>
-      <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2" />
-      <path d="M7 2v20" />
-      <path d="M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7" />
-    </svg>
-  )
-}
-
-export function ZapIcon({ className }: IconProps) {
-  return (
-    <svg {...iconProps} className={className}>
-      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-    </svg>
-  )
-}
-
-export function BookIcon({ className }: IconProps) {
-  return (
-    <svg {...iconProps} className={className}>
-      <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" />
-      <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
-    </svg>
-  )
-}
-
 const HABIT_ICONS: Record<string, React.ComponentType<IconProps>> = {
-  habit_pourover_coffee: CoffeeIcon,
-  habit_dog_walk: RouteIcon,
+  // Morning
+  habit_brew_coffee: CoffeeIcon,
+  habit_walk_karma: RouteIcon,
+  habit_healthy_breakfast: SunriseIcon,
+  habit_read_podcast: HeadphonesIcon,
+  // Afternoon
   habit_healthy_lunch: BowlIcon,
+  habit_drink_water: DropletIcon,
+  habit_focus_work: ZapIcon,
   habit_gym: DumbbellIcon,
+  // Evening
   habit_cook_meal: PotIcon,
   habit_meditation: LeafIcon,
   habit_10k_steps: ActivityIcon,
-  habit_healthy_dinner: UtensilsIcon,
-  habit_focus_work: ZapIcon,
-  habit_reading: BookIcon,
 }
 
 interface HabitIconProps {

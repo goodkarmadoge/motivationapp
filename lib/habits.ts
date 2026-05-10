@@ -54,14 +54,44 @@ export const CORE_PILLARS: CorePillarDefinition[] = [
 ]
 
 export const MORNING_HABITS: HabitDefinition[] = [
-  { key: 'habit_pourover_coffee', label: 'Make Pourover Coffee', emoji: '☕', session: 'morning' },
-  { key: 'habit_dog_walk', label: 'Take Dog on Morning Walk', emoji: '🐕', session: 'morning' },
-  { key: 'habit_healthy_lunch', label: 'Eat a Healthy Lunch', emoji: '🥗', session: 'morning' },
-  { key: 'habit_reading', label: '30 Minutes of Reading', emoji: '📚', session: 'morning' },
+  { key: 'habit_brew_coffee', label: 'Brew Coffee', emoji: '☕', session: 'morning' },
+  { key: 'habit_walk_karma', label: 'Walk Karma', emoji: '🐕', session: 'morning' },
+  { key: 'habit_healthy_breakfast', label: 'Healthy Breakfast', emoji: '🍳', session: 'morning' },
+  { key: 'habit_read_podcast', label: 'Read or Podcast 30 Min', emoji: '📚', session: 'morning' },
+]
+
+export const AFTERNOON_HABITS: HabitDefinition[] = [
+  { key: 'habit_healthy_lunch', label: 'Healthy Lunch', emoji: '🥗', session: 'afternoon' },
+  {
+    key: 'habit_drink_water',
+    label: 'Drink Cup of Water',
+    emoji: '💧',
+    session: 'afternoon',
+    subField: {
+      type: 'count',
+      key: 'habit_drink_water_count',
+      label: 'How many cups?',
+      min: 1,
+      max: 3,
+    },
+  },
+  {
+    key: 'habit_focus_work',
+    label: 'Focus Work',
+    emoji: '💻',
+    session: 'afternoon',
+    subField: {
+      type: 'count',
+      key: 'habit_focus_work_count',
+      label: 'Hours of focus?',
+      min: 1,
+      max: 3,
+    },
+  },
+  { key: 'habit_gym', label: 'Workout at Gym', emoji: '🏋️', session: 'afternoon' },
 ]
 
 export const EVENING_HABITS: HabitDefinition[] = [
-  { key: 'habit_gym', label: 'Workout at the Gym', emoji: '🏋️', session: 'evening' },
   {
     key: 'habit_cook_meal',
     label: 'Cook a Meal Today',
@@ -76,23 +106,10 @@ export const EVENING_HABITS: HabitDefinition[] = [
     },
   },
   { key: 'habit_meditation', label: 'Daily Calm Meditation', emoji: '🧘', session: 'evening' },
-  {
-    key: 'habit_10k_steps',
-    label: 'Hit 10K Steps Today',
-    emoji: '👟',
-    session: 'evening',
-    subField: {
-      type: 'number',
-      key: 'habit_step_count',
-      label: 'Step count',
-      placeholder: 'e.g. 10432',
-    },
-  },
-  { key: 'habit_healthy_dinner', label: 'Eat a Healthy Dinner', emoji: '🥦', session: 'evening' },
-  { key: 'habit_focus_work', label: 'Meaningful Focus Work', emoji: '💻', session: 'evening' },
+  { key: 'habit_10k_steps', label: 'Hit 10K Steps', emoji: '👟', session: 'evening' },
 ]
 
-export const ALL_HABITS: HabitDefinition[] = [...MORNING_HABITS, ...EVENING_HABITS]
+export const ALL_HABITS: HabitDefinition[] = [...MORNING_HABITS, ...AFTERNOON_HABITS, ...EVENING_HABITS]
 
 export const HABIT_BOOLEAN_KEYS = ALL_HABITS.map((h) => h.key)
 
@@ -110,8 +127,7 @@ export function calculateDailyScore(log: Partial<DailyLog>): { score: number; ma
 export function getWeekStart(date: Date): Date {
   const d = new Date(date)
   const day = d.getDay()
-  // Monday-based week
-  const diff = (day === 0 ? -6 : 1 - day)
+  const diff = day === 0 ? -6 : 1 - day
   d.setDate(d.getDate() + diff)
   d.setHours(0, 0, 0, 0)
   return d
@@ -137,19 +153,25 @@ export const DEFAULT_DAILY_LOG: Omit<DailyLog, 'log_date'> = {
   pillar_motivated: null,
   pillar_note: null,
   pillars_submitted_at: null,
-  habit_pourover_coffee: false,
-  habit_dog_walk: false,
+  // Morning
+  habit_brew_coffee: false,
+  habit_walk_karma: false,
+  habit_healthy_breakfast: false,
+  habit_read_podcast: false,
+  // Afternoon
   habit_healthy_lunch: false,
+  habit_drink_water: false,
+  habit_drink_water_count: null,
+  habit_focus_work: false,
+  habit_focus_work_count: null,
   habit_gym: false,
+  // Evening
   habit_cook_meal: false,
   habit_cook_meal_count: null,
   habit_meditation: false,
   habit_10k_steps: false,
   habit_step_count: null,
   habit_step_source: 'manual',
-  habit_healthy_dinner: false,
-  habit_focus_work: false,
-  habit_reading: false,
   evening_reflection: null,
   daily_score: 0,
   max_possible_score: 25,

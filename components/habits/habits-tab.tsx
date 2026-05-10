@@ -2,8 +2,8 @@
 
 import { useCallback, useRef, useState } from 'react'
 import { HabitCard } from './habit-card'
-import { GoogleFitBanner } from './google-fit-banner'
-import { MORNING_HABITS, EVENING_HABITS, isFriday } from '@/lib/habits'
+import { GarminBanner } from './garmin-banner'
+import { MORNING_HABITS, AFTERNOON_HABITS, EVENING_HABITS, isFriday } from '@/lib/habits'
 import { upsertDailyLog } from '@/app/dashboard/actions'
 import { WeekRecapSection } from '@/components/integrate/week-recap-section'
 import type { DailyLog, WeeklyLog } from '@/types/habit'
@@ -14,10 +14,9 @@ interface HabitsTabProps {
   today: string
   onLogChange: (log: DailyLog) => void
   isDemo?: boolean
-  googleFitConnected?: boolean
 }
 
-export function HabitsTab({ log, weeklyLog, today, onLogChange, isDemo, googleFitConnected }: HabitsTabProps) {
+export function HabitsTab({ log, weeklyLog, today, onLogChange, isDemo }: HabitsTabProps) {
   const logRef = useRef<DailyLog>(log)
   logRef.current = log
 
@@ -51,9 +50,10 @@ export function HabitsTab({ log, weeklyLog, today, onLogChange, isDemo, googleFi
   const greeting =
     hour < 12 ? 'Good morning.' : hour < 17 ? 'Good afternoon.' : 'Good evening.'
 
-  const allHabits = [...MORNING_HABITS, ...EVENING_HABITS]
+  const allHabits = [...MORNING_HABITS, ...AFTERNOON_HABITS, ...EVENING_HABITS]
   const totalDone = allHabits.filter((h) => !!(log[h.key as keyof DailyLog])).length
   const morningDone = MORNING_HABITS.filter((h) => !!(log[h.key as keyof DailyLog])).length
+  const afternoonDone = AFTERNOON_HABITS.filter((h) => !!(log[h.key as keyof DailyLog])).length
   const eveningDone = EVENING_HABITS.filter((h) => !!(log[h.key as keyof DailyLog])).length
   const pct = totalDone / allHabits.length
 
@@ -90,35 +90,46 @@ export function HabitsTab({ log, weeklyLog, today, onLogChange, isDemo, googleFi
       {/* Morning section */}
       <section className="mb-8">
         <div className="flex items-center justify-between mb-4 animate-fade-up" style={{ animationDelay: '80ms' }}>
-          <p className="text-[10px] font-semibold text-white/28 uppercase tracking-[0.2em]">
-            Morning
-          </p>
+          <p className="text-[10px] font-semibold text-white/28 uppercase tracking-[0.2em]">Morning</p>
           <p className="text-[10px] text-white/20 tabular-nums">
             {morningDone} / {MORNING_HABITS.length}
           </p>
         </div>
         <div className="grid grid-cols-2 gap-2.5">
           {MORNING_HABITS.map((habit, i) => (
+            <HabitCard key={habit.key} habit={habit} log={log} onChange={handleChange} index={i + 2} />
+          ))}
+        </div>
+      </section>
+
+      {/* Divider */}
+      <div className="h-px bg-white/[0.05] mb-8 animate-fade-up" style={{ animationDelay: '160ms' }} />
+
+      {/* Afternoon section */}
+      <section className="mb-8">
+        <div className="flex items-center justify-between mb-4 animate-fade-up" style={{ animationDelay: '180ms' }}>
+          <p className="text-[10px] font-semibold text-white/28 uppercase tracking-[0.2em]">Afternoon</p>
+          <p className="text-[10px] text-white/20 tabular-nums">
+            {afternoonDone} / {AFTERNOON_HABITS.length}
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-2.5">
+          {AFTERNOON_HABITS.map((habit, i) => (
             <HabitCard
               key={habit.key}
               habit={habit}
               log={log}
               onChange={handleChange}
-              index={i + 2}
+              index={i + MORNING_HABITS.length + 2}
             />
           ))}
         </div>
       </section>
 
-      {/* Google Fit banner */}
+      {/* Garmin Connect banner */}
       {!isDemo && (
         <div className="mb-8 animate-fade-up" style={{ animationDelay: '200ms' }}>
-          <GoogleFitBanner
-            connected={!!googleFitConnected}
-            log={log}
-            today={today}
-            onLogChange={onLogChange}
-          />
+          <GarminBanner log={log} today={today} onLogChange={onLogChange} />
         </div>
       )}
 
@@ -127,10 +138,8 @@ export function HabitsTab({ log, weeklyLog, today, onLogChange, isDemo, googleFi
 
       {/* Evening section */}
       <section className="mb-8">
-        <div className="flex items-center justify-between mb-4 animate-fade-up" style={{ animationDelay: '220ms' }}>
-          <p className="text-[10px] font-semibold text-white/28 uppercase tracking-[0.2em]">
-            Evening
-          </p>
+        <div className="flex items-center justify-between mb-4 animate-fade-up" style={{ animationDelay: '260ms' }}>
+          <p className="text-[10px] font-semibold text-white/28 uppercase tracking-[0.2em]">Evening</p>
           <p className="text-[10px] text-white/20 tabular-nums">
             {eveningDone} / {EVENING_HABITS.length}
           </p>
@@ -142,7 +151,7 @@ export function HabitsTab({ log, weeklyLog, today, onLogChange, isDemo, googleFi
               habit={habit}
               log={log}
               onChange={handleChange}
-              index={i + MORNING_HABITS.length + 4}
+              index={i + MORNING_HABITS.length + AFTERNOON_HABITS.length + 4}
             />
           ))}
         </div>

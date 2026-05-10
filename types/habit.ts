@@ -1,17 +1,17 @@
 export type PillarKey = 'happy' | 'healthy' | 'wealthy' | 'grounded' | 'motivated'
 
 export type HabitKey =
-  | 'habit_pourover_coffee'
-  | 'habit_dog_walk'
+  | 'habit_brew_coffee'
+  | 'habit_walk_karma'
+  | 'habit_healthy_breakfast'
+  | 'habit_read_podcast'
   | 'habit_healthy_lunch'
+  | 'habit_drink_water'
+  | 'habit_focus_work'
   | 'habit_gym'
   | 'habit_cook_meal'
   | 'habit_meditation'
   | 'habit_10k_steps'
-  | 'habit_healthy_dinner'
-  | 'habit_focus_work'
-  | 'habit_reading'
-  | 'habit_healthy_lunch'
 
 export interface DailyLog {
   id?: string
@@ -28,21 +28,26 @@ export interface DailyLog {
   pillars_submitted_at: string | null
 
   // Morning habits
-  habit_pourover_coffee: boolean
-  habit_dog_walk: boolean
+  habit_brew_coffee: boolean
+  habit_walk_karma: boolean
+  habit_healthy_breakfast: boolean
+  habit_read_podcast: boolean
+
+  // Afternoon habits
   habit_healthy_lunch: boolean
+  habit_drink_water: boolean
+  habit_drink_water_count: number | null
+  habit_focus_work: boolean
+  habit_focus_work_count: number | null
+  habit_gym: boolean
 
   // Evening habits
-  habit_gym: boolean
   habit_cook_meal: boolean
   habit_cook_meal_count: number | null
   habit_meditation: boolean
   habit_10k_steps: boolean
   habit_step_count: number | null
-  habit_step_source: 'manual' | 'google_fit'
-  habit_healthy_dinner: boolean
-  habit_focus_work: boolean
-  habit_reading: boolean
+  habit_step_source: 'manual' | 'garmin'
 
   // Reflection
   evening_reflection: string | null
@@ -86,7 +91,7 @@ export interface HabitDefinition {
   key: HabitKey
   label: string
   emoji: string
-  session: 'morning' | 'evening'
+  session: 'morning' | 'afternoon' | 'evening'
   subField?: {
     type: 'number' | 'count'
     key: keyof DailyLog
@@ -101,9 +106,9 @@ export interface CorePillarDefinition {
   key: PillarKey
   dbKey: keyof DailyLog
   label: string
-  color: string       // hex for Recharts
-  textClass: string   // Tailwind text class
-  bgClass: string     // Tailwind bg class
-  borderClass: string // Tailwind border class
-  trackClass: string  // Tailwind accent class for range input
+  color: string
+  textClass: string
+  bgClass: string
+  borderClass: string
+  trackClass: string
 }
