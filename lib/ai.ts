@@ -1,8 +1,8 @@
-import Anthropic from '@anthropic-ai/sdk'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 import type { DailyLog, PillarKey } from '@/types/habit'
 import { ALL_HABITS, HABIT_BOOLEAN_KEYS } from '@/lib/habits'
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
 export interface AiInsightPayload {
   correlation_text: string
@@ -62,19 +62,13 @@ export function parseAiResponse(text: string): AiInsightPayload {
 export async function generateInsight(logs: DailyLog[]): Promise<AiInsightPayload> {
   const prompt = buildHabitPrompt(logs)
 
-  const msg = await client.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 1024,
-    system: [
-      {
-        type: 'text',
-        text: 'You are a personal productivity coach. You analyze habit tracking data to find patterns and provide actionable insights. Always respond with valid JSON only — no preamble, no markdown code fences.',
-      },
-    ],
-    messages: [{ role: 'user', content: prompt }],
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-1.5-flash',
+    systemInstruction:
+      'You are a personal productivity coach. You analyze habit tracking data to find patterns and provide actionable insights. Always respond with valid JSON only — no preamble, no markdown code fences.',
   })
 
-  const content = msg.content[0]
-  if (content.type !== 'text') throw new Error('Unexpected response type')
-  return parseAiResponse(content.text)
+  const result = await model.generateContent(prompt)
+  const text = result.response.text()
+  return parseAiResponse(text)
 }
