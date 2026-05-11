@@ -17,7 +17,6 @@ export function AiInsightCard({ today }: AiInsightCardProps) {
   const [error, setError] = useState<string | null>(null)
   const [, startTransition] = useTransition()
 
-  // On mount: cache lookup only — fast Supabase read, no generation
   useEffect(() => {
     let cancelled = false
     async function checkCache() {
@@ -28,7 +27,7 @@ export function AiInsightCard({ today }: AiInsightCardProps) {
           setInsight(data ?? null)
         }
       } catch {
-        // cache miss is fine — user can generate manually
+        // cache miss is fine
       } finally {
         if (!cancelled) setCacheChecked(true)
       }
@@ -46,7 +45,10 @@ export function AiInsightCard({ today }: AiInsightCardProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date: today }),
       })
-      if (!res.ok) throw new Error(await res.text())
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({ error: 'Unknown error' }))
+        throw new Error(body.error ?? 'Failed to generate insight')
+      }
       setInsight(await res.json())
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to generate insight')
@@ -79,7 +81,7 @@ export function AiInsightCard({ today }: AiInsightCardProps) {
             AI Insight
           </h2>
           <p className="text-white/35 mt-1 text-sm">
-            Powered by Claude — correlations & predictions
+            Powered by Gemini — correlations & predictions
           </p>
         </div>
         {insight && !generating && (
@@ -94,7 +96,6 @@ export function AiInsightCard({ today }: AiInsightCardProps) {
 
       <div className="rounded-2xl border border-white/[0.05] bg-white/[0.03] p-5 space-y-5">
 
-        {/* Brief skeleton while cache check is in-flight */}
         {!cacheChecked && (
           <div className="space-y-3 animate-pulse">
             <div className="h-3 bg-white/[0.06] rounded w-3/4" />
@@ -102,7 +103,6 @@ export function AiInsightCard({ today }: AiInsightCardProps) {
           </div>
         )}
 
-        {/* No cached insight — show generate CTA */}
         {cacheChecked && !insight && !generating && !error && (
           <div className="flex flex-col items-center py-5 gap-4">
             <p className="text-sm text-white/40 text-center leading-relaxed max-w-[260px]">
@@ -117,7 +117,6 @@ export function AiInsightCard({ today }: AiInsightCardProps) {
           </div>
         )}
 
-        {/* Generating spinner */}
         {generating && (
           <div className="flex flex-col items-center py-6 gap-3">
             <div className="w-5 h-5 rounded-full border-2 border-[#C8A96E]/30 border-t-[#C8A96E] animate-spin" />
@@ -125,7 +124,6 @@ export function AiInsightCard({ today }: AiInsightCardProps) {
           </div>
         )}
 
-        {/* Error state */}
         {error && !generating && (
           <div className="space-y-3">
             <p className="text-sm text-red-400/90">{error}</p>
@@ -138,7 +136,6 @@ export function AiInsightCard({ today }: AiInsightCardProps) {
           </div>
         )}
 
-        {/* Insight content */}
         {insight && !generating && (
           <>
             {insight.correlation_text && (
