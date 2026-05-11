@@ -52,9 +52,9 @@ export async function GET(req: NextRequest) {
 
   const genAI = new GoogleGenerativeAI(geminiKey)
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash-preview-image-generation',
+    model: 'gemini-2.5-flash-image',
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    generationConfig: { responseModalities: ['IMAGE', 'TEXT'] } as any,
+    generationConfig: { responseModalities: ['Text', 'Image'] } as any,
   })
 
   let result
