@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export const maxDuration = 60
 
@@ -29,52 +30,69 @@ export async function GET(req: NextRequest) {
 
   if (supabaseUrl && supabaseKey) {
     const supabase = createClient(supabaseUrl, supabaseKey)
-    const { data: cached } = await supabase.from('trip_image_cache').select('image_base64, mime_type').eq('destination', destKey).single()
+    const { data: cached } = await supabase
+      .from('trip_image_cache')
+      .select('image_base64, mime_type')
+      .eq('destination', destKey)
+      .single()
     if (cached?.image_base64) {
       const buffer = Buffer.from(cached.image_base64, 'base64')
-      return new NextResponse(buffer, { headers: { 'Content-Type': cached.mime_type ?? 'image/png', 'Cache-Control': 'public, max-age=604800' } })
+      return new NextResponse(buffer, {
+        headers: { 'Content-Type': cached.mime_type ?? 'image/png', 'Cache-Control': 'public, max-age=604800' },
+      })
     }
   }
 
   if (!geminiKey) {
-    return new NextResponse(JSON.stringify({ error: 'GEMINI_API_KEY not configured' }), { status: 500, headers: { 'Content-Type': 'application/json' } })
-  }
-
-  const imagenUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-fast-generate-001:predict?key=${geminiKey}`
-  let imagenRes: Response
-  try {
-    imagenRes = await fetch(imagenUrl, {
-      method: 'POST',
+    return new NextResponse(JSON.stringify({ error: 'GEMINI_API_KEY not configured' }), {
+      status: 500,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ instances: [{ prompt: getPrompt(dest) }], parameters: { sampleCount: 1, aspectRatio: '16:9' } }),
     })
+  }
+
+  const genAI = new GoogleGenerativeAI(geminiKey)
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-2.0-flash-preview-image-generation',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    generationConfig: { responseModalities: ['IMAGE', 'TEXT'] } as any,
+  })
+
+  let result
+  try {
+    result = await model.generateContent(getPrompt(dest))
   } catch (err) {
-    console.error('[trip-image] fetch error:', err)
-    return new NextResponse(JSON.stringify({ error: 'Request failed', detail: String(err) }), { status: 502, headers: { 'Content-Type': 'application/json' } })
+    console.error('[trip-image] generateContent error:', err)
+    return new NextResponse(JSON.stringify({ error: 'Request failed', detail: String(err) }), {
+      status: 502,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 
-  if (!imagenRes.ok) {
-    const errText = await imagenRes.text()
-    console.error('[trip-image] HTTP error:', imagenRes.status, errText)
-    return new NextResponse(JSON.stringify({ error: 'Imagen error', status: imagenRes.status, detail: errText }), { status: 502, headers: { 'Content-Type': 'application/json' } })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const parts: any[] = result.response.candidates?.[0]?.content?.parts ?? []
+  const imagePart = parts.find((p) => p.inlineData?.data)
+
+  if (!imagePart?.inlineData) {
+    console.error('[trip-image] No image in response:', JSON.stringify(result.response).slice(0, 600))
+    return new NextResponse(JSON.stringify({ error: 'No image generated' }), {
+      status: 502,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 
-  const imagenJson = await imagenRes.json()
-  const prediction = imagenJson.predictions?.[0]
-  const base64: string | undefined = prediction?.bytesBase64Encoded
-  const mimeType: string = prediction?.mimeType ?? 'image/png'
-
-  if (!base64) {
-    console.error('[trip-image] No prediction:', JSON.stringify(imagenJson).slice(0, 600))
-    return new NextResponse(JSON.stringify({ error: 'No image generated', raw: imagenJson }), { status: 502, headers: { 'Content-Type': 'application/json' } })
-  }
+  const base64: string = imagePart.inlineData.data
+  const mimeType: string = imagePart.inlineData.mimeType ?? 'image/png'
 
   if (supabaseUrl && supabaseKey) {
     const supabase = createClient(supabaseUrl, supabaseKey)
-    supabase.from('trip_image_cache').upsert({ destination: destKey, image_base64: base64, mime_type: mimeType })
+    supabase
+      .from('trip_image_cache')
+      .upsert({ destination: destKey, image_base64: base64, mime_type: mimeType })
       .then(({ error }) => { if (error) console.error('[trip-image] cache write error:', error) })
   }
 
   const buffer = Buffer.from(base64, 'base64')
-  return new NextResponse(buffer, { headers: { 'Content-Type': mimeType, 'Cache-Control': 'public, max-age=604800' } })
+  return new NextResponse(buffer, {
+    headers: { 'Content-Type': mimeType, 'Cache-Control': 'public, max-age=604800' },
+  })
 }
