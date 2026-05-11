@@ -63,7 +63,7 @@ export async function generateInsight(logs: DailyLog[]): Promise<AiInsightPayloa
   const prompt = buildHabitPrompt(logs)
 
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
+    model: 'gemini-2.5-flash',
     systemInstruction:
       'You are a personal productivity coach. You analyze habit tracking data to find patterns and provide actionable insights. Always respond with valid JSON only — no preamble, no markdown code fences.',
   })
