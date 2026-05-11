@@ -7,21 +7,21 @@ export const CORE_PILLARS: CorePillarDefinition[] = [
   { key: 'motivated', dbKey: 'pillar_motivated', label: 'Motivated', color: '#f43f5e', textClass: 'text-rose-500', bgClass: 'bg-rose-50', borderClass: 'border-rose-300', trackClass: 'accent-rose-500' },
 ]
 export const MORNING_HABITS: HabitDefinition[] = [
-  { key: 'habit_brew_coffee', label: 'Brew Coffee', emoji: 'coffee', session: 'morning' },
-  { key: 'habit_walk_karma', label: 'Walk Karma', emoji: 'dog', session: 'morning' },
-  { key: 'habit_healthy_breakfast', label: 'Healthy Breakfast', emoji: 'egg', session: 'morning' },
-  { key: 'habit_read_podcast', label: 'Read or Podcast 30 Min', emoji: 'book', session: 'morning' },
+  { key: 'habit_brew_coffee', label: 'Brew Coffee', emoji: '☕', session: 'morning' },
+  { key: 'habit_walk_karma', label: 'Walk Karma', emoji: '🐕', session: 'morning' },
+  { key: 'habit_healthy_breakfast', label: 'Healthy Breakfast', emoji: '🍳', session: 'morning' },
+  { key: 'habit_read_podcast', label: 'Read or Podcast 30 Min', emoji: '📚', session: 'morning' },
 ]
 export const AFTERNOON_HABITS: HabitDefinition[] = [
-  { key: 'habit_healthy_lunch', label: 'Healthy Lunch', emoji: 'salad', session: 'afternoon' },
-  { key: 'habit_drink_water', label: 'Drink Cup of Water', emoji: 'water', session: 'afternoon', subField: { type: 'count', key: 'habit_drink_water_count', label: 'How many cups?', min: 1, max: 3 } },
-  { key: 'habit_focus_work', label: 'Focus Work', emoji: 'laptop', session: 'afternoon', subField: { type: 'count', key: 'habit_focus_work_count', label: 'Hours of focus?', min: 1, max: 3 } },
-  { key: 'habit_gym', label: 'Workout at Gym', emoji: 'gym', session: 'afternoon' },
+  { key: 'habit_healthy_lunch', label: 'Healthy Lunch', emoji: '🥗', session: 'afternoon' },
+  { key: 'habit_drink_water', label: 'Drink Cup of Water', emoji: '💧', session: 'afternoon', subField: { type: 'count', key: 'habit_drink_water_count', label: 'How many cups?', min: 1, max: 3 } },
+  { key: 'habit_focus_work', label: 'Focus Work', emoji: '💻', session: 'afternoon', subField: { type: 'count', key: 'habit_focus_work_count', label: 'Hours of focus?', min: 1, max: 3 } },
+  { key: 'habit_gym', label: 'Workout at Gym', emoji: '🏋️', session: 'afternoon' },
 ]
 export const EVENING_HABITS: HabitDefinition[] = [
-  { key: 'habit_cook_meal', label: 'Cook a Meal Today', emoji: 'cook', session: 'evening', subField: { type: 'count', key: 'habit_cook_meal_count', label: 'How many meals?', min: 1, max: 3 } },
-  { key: 'habit_meditation', label: 'Daily Calm Meditation', emoji: 'leaf', session: 'evening' },
-  { key: 'habit_10k_steps', label: 'Hit 10K Steps', emoji: 'steps', session: 'evening' },
+  { key: 'habit_cook_meal', label: 'Cook a Meal Today', emoji: '🍳', session: 'evening', subField: { type: 'count', key: 'habit_cook_meal_count', label: 'How many meals?', min: 1, max: 3 } },
+  { key: 'habit_meditation', label: 'Daily Calm Meditation', emoji: '🧘', session: 'evening' },
+  { key: 'habit_10k_steps', label: 'Hit 10K Steps', emoji: '👟', session: 'evening' },
 ]
 export const ALL_HABITS: HabitDefinition[] = [...MORNING_HABITS, ...AFTERNOON_HABITS, ...EVENING_HABITS]
 export const HABIT_BOOLEAN_KEYS = ALL_HABITS.map((h) => h.key)
