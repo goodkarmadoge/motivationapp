@@ -5,13 +5,13 @@ import { cn } from '@/lib/utils'
 interface TripCardProps {
   name: string
   date: string
-  imageUrl: string
   status: 'upcoming' | 'past'
   index: number
 }
 
-export function TripCard({ name, date, imageUrl, status, index }: TripCardProps) {
+export function TripCard({ name, date, status, index }: TripCardProps) {
   const isUpcoming = status === 'upcoming'
+  const imgSrc = `/api/trip-image?dest=${encodeURIComponent(name)}`
 
   return (
     <div
@@ -23,7 +23,7 @@ export function TripCard({ name, date, imageUrl, status, index }: TripCardProps)
     >
       {/* Image */}
       <img
-        src={imageUrl}
+        src={imgSrc}
         alt={name}
         className="absolute inset-0 w-full h-full object-cover"
         style={isUpcoming ? undefined : { filter: 'brightness(0.8) saturate(0.75)' }}
@@ -57,7 +57,7 @@ export function TripCard({ name, date, imageUrl, status, index }: TripCardProps)
           <span
             className={cn(
               'text-[11px] font-medium tracking-wide',
-              isUpcoming ? 'text-[#C8A96E]/75' : 'text-white/28'
+              isUpcoming ? 'text-[#C8A96E]' : 'text-white/28'
             )}
           >
             {date}
