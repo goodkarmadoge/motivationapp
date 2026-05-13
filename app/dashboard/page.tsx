@@ -6,18 +6,32 @@ import { getDailyLog, getCurrentWeeklyLog } from './actions'
 import { DEFAULT_DAILY_LOG, todayISO } from '@/lib/habits'
 import type { DailyLog } from '@/types/habit'
 
-export default async function DashboardPage() {
+interface DashboardPageProps {
+  searchParams: Promise<{ date?: string }>
+}
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const cookieStore = await cookies()
   const isDemo = cookieStore.get('demo_mode')?.value === '1'
   const today = todayISO()
 
+  const params = await searchParams
+  let selectedDate = params.date || today
+
+  // Prevent future-date navigation
+  if (new Date(selectedDate) > new Date(today)) {
+    selectedDate = today
+  }
+
   if (isDemo) {
-    const initialLog: DailyLog = { ...DEFAULT_DAILY_LOG, log_date: today }
+    const initialLog: DailyLog = { ...DEFAULT_DAILY_LOG, log_date: selectedDate }
     return (
       <DashboardShell
+        key={selectedDate}
         initialLog={initialLog}
         initialWeeklyLog={null}
         today={today}
+        selectedDate={selectedDate}
         isDemo
       />
     )
@@ -28,13 +42,13 @@ export default async function DashboardPage() {
   if (!user) redirect('/sign-in')
 
   const [existingLog, weeklyLog] = await Promise.all([
-    getDailyLog(today),
+    getDailyLog(selectedDate),
     getCurrentWeeklyLog(),
   ])
 
   const initialLog: DailyLog = existingLog ?? {
     ...DEFAULT_DAILY_LOG,
-    log_date: today,
+    log_date: selectedDate,
     user_id: user.id,
   }
 
@@ -47,9 +61,11 @@ export default async function DashboardPage() {
 
   return (
     <DashboardShell
+      key={selectedDate}
       initialLog={initialLog}
       initialWeeklyLog={weeklyLog}
       today={today}
+      selectedDate={selectedDate}
       userFirstName={firstName}
     />
   )
